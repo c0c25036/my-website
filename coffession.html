@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>大切なあなたへ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --sakura: #f9b8c9;
+      --deep-rose: #d4446e;
+      --blush: #fce8ef;
+      --cream: #fff8f5;
+      --ink: #2a1a22;
+      --soft: #e8a0b4;
+      --gold: #e8b86d;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--cream);
+      font-family: 'Zen Maru Gothic', sans-serif;
+      color: var(--ink);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── カスタムカーソル ── */
+    .cursor {
+      position: fixed;
+      width: 18px;
+      height: 18px;
+      background: var(--deep-rose);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, background 0.2s;
+      mix-blend-mode: multiply;
+    }
+    .cursor.big {
+      transform: translate(-50%, -50%) scale(2.5);
+      background: var(--sakura);
+    }
+
+    /* ── 花びら背景アニメーション ── */
+    .petals-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .petal {
+      position: absolute;
+      top: -60px;
+      font-size: 1.2rem;
+      animation: fall linear infinite;
+      opacity: 0.7;
+    }
+
+    @keyframes fall {
+      0%   { transform: translateY(-60px) rotate(0deg) translateX(0); opacity: 0.8; }
+      50%  { transform: translateY(50vh) rotate(180deg) translateX(30px); }
+      100% { transform: translateY(110vh) rotate(360deg) translateX(-20px); opacity: 0; }
+    }
+
+    /* ── ページ全体レイアウト ── */
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── セクション1：表紙 ── */
+    #cover {
+      text-align: center;
+    }
+
+    .envelope {
+      font-size: 6rem;
+      display: inline-block;
+      animation: float 3s ease-in-out infinite;
+      cursor: pointer;
+      transition: transform 0.2s;
+      filter: drop-shadow(0 8px 24px rgba(212,68,110,0.25));
+    }
+    .envelope:hover { transform: scale(1.15) rotate(-5deg); }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-14px); }
+    }
+
+    .cover-title {
+      font-family: 'Shippori Mincho', serif;
+      font-size: clamp(1.6rem, 5vw, 3rem);
+      color: var(--deep-rose);
+      margin-top: 1.5rem;
+      letter-spacing: 0.15em;
+      animation: fadeUp 1s ease both;
+    }
+
+    .cover-sub {
+      font-size: 0.95rem;
+      color: var(--soft);
+      margin-top: 0.5rem;
+      letter-spacing: 0.2em;
+      animation: fadeUp 1.2s ease both;
+    }
+
+    .btn-open {
+      margin-top: 2.5rem;
+      padding: 0.85rem 2.8rem;
+      background: var(--deep-rose);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Zen Maru Gothic', sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(212,68,110,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+      animation: fadeUp 1.4s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-open::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.25) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform 0.5s;
+    }
+    .btn-open:hover::after { transform: translateX(100%); }
+    .btn-open:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 32px rgba(212,68,110,0.45);
+    }
+
+    /* ── セクション2：メッセージ ── */
+    #message {
+      display: none;
+      max-width: 640px;
+      width: 100%;
+    }
+
+    .letter-card {
+      background: white;
+      border-radius: 24px;
+      padding: clamp(2rem, 5vw, 3.5rem);
+      box-shadow:
+        0 2px 0 var(--sakura),
+        0 20px 60px rgba(212,68,110,0.12),
+        0 4px 16px rgba(0,0,0,0.06);
+      position: relative;
+      animation: scaleIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+      border: 1.5px solid rgba(249,184,201,0.4);
+    }
+
+    .letter-card::before {
+      content: '❝';
+      position: absolute;
+      top: -0.6rem;
+      left: 1.5rem;
+      font-size: 4rem;
+      color: var(--sakura);
+      line-height: 1;
+      font-family: Georgia, serif;
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.85) translateY(20px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .letter-date {
+      font-size: 0.78rem;
+      color: var(--soft);
+      letter-spacing: 0.15em;
+      margin-bottom: 1.5rem;
+      text-align: right;
+    }
+
+    .letter-greeting {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1.25rem;
+      color: var(--deep-rose);
+      margin-bottom: 1.2rem;
+    }
+
+    .letter-body {
+      line-height: 2.2;
+      font-size: 1.02rem;
+      color: var(--ink);
+      white-space: pre-line;
+    }
+
+    .letter-signature {
+      margin-top: 2rem;
+      text-align: right;
+      font-family: 'Shippori Mincho', serif;
+      font-size: 1rem;
+      color: var(--deep-rose);
+    }
+
+    /* ── セクション3：ハート告白 ── */
+    #confession {
+      display: none;
+      text-align: center;
+      max-width: 560px;
+    }
+
+    .big-heart {
+      font-size: 5rem;
+      display: inline-block;
+      animation: heartbeat 1.2s ease-in-out infinite;
+      filter: drop-shadow(0 6px 18px rgba(212,68,110,0.4));
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      14%       { transform: scale(1.2); }
+      28%       { transform: scale(1); }
+      42%       { transform: scale(1.15); }
+      70%       { transform: scale(1); }
+    }
+
+    .confession-text {
+      font-family: 'Shippori Mincho', serif;
+      font-size: clamp(1.5rem, 4vw, 2.4rem);
+      color: var(--deep-rose);
+      margin: 1.5rem 0;
+      line-height: 1.8;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .confession-sub {
+      font-size: 0.92rem;
+      color: var(--soft);
+      line-height: 1.9;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .answer-btns {
+      display: flex;
+      gap: 1.2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-yes {
+      padding: 0.9rem 2.5rem;
+      background: var(--deep-rose);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Zen Maru Gothic', sans-serif;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(212,68,110,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-yes:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 32px rgba(212,68,110,0.5);
+    }
+
+    .btn-no {
+      padding: 0.9rem 2.5rem;
+      background: transparent;
+      color: var(--soft);
+      border: 2px solid var(--sakura);
+      border-radius: 50px;
+      font-family: 'Zen Maru Gothic', sans-serif;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .btn-no:hover { border-color: var(--deep-rose); color: var(--deep-rose); }
+
+    /* ── セクション4：おめでとう！ ── */
+    #celebration {
+      display: none;
+      text-align: center;
+    }
+
+    .celebrate-emoji {
+      font-size: 4rem;
+      animation: spin 1s ease both;
+    }
+    @keyframes spin {
+      from { transform: rotate(-20deg) scale(0); opacity: 0; }
+      to   { transform: rotate(0deg) scale(1); opacity: 1; }
+    }
+
+    .celebrate-title {
+      font-family: 'Shippori Mincho', serif;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      color: var(--deep-rose);
+      margin: 1rem 0 0.5rem;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .celebrate-msg {
+      font-size: 1rem;
+      color: #888;
+      line-height: 2;
+      max-width: 420px;
+      animation: fadeUp 0.6s 0.5s ease both;
+    }
+
+    /* ── 共通アニメーション ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── 紙吹雪 ── */
+    .confetti-piece {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      top: -20px;
+      pointer-events: none;
+      z-index: 999;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ── 装飾ライン ── */
+    .deco-line {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--sakura), transparent);
+      margin: 1.5rem auto;
+    }
+
+    .hearts-row {
+      font-size: 1.1rem;
+      letter-spacing: 0.3rem;
+      color: var(--sakura);
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+
+  <!-- 花びら -->
+  <div class="petals-container" id="petals"></div>
+
+  <!-- ① 表紙 -->
+  <div class="page" id="cover">
+    <div class="envelope" onclick="openLetter()" title="開けてみて">💌</div>
+    <h1 class="cover-title">大切なあなたへ</h1>
+    <p class="cover-sub">— a letter just for you —</p>
+    <div class="deco-line"></div>
+    <button class="btn-open" onclick="openLetter()">開けてみて ✦</button>
+  </div>
+
+  <!-- ② お手紙 -->
+  <div class="page" id="message">
+    <div class="letter-card">
+      <div class="letter-date" id="letter-date"></div>
+      <p class="letter-greeting">こんにちは、</p>
+      <p class="letter-body">
+ずっと、伝えたかったことがあります。
+
+一緒にいると、なんだか自然と笑顔になれる。
+あなたのことを思うと、ちょっとだけドキドキする。
+
+そんな気持ちを、正直に伝えたくて
+このページを作りました。
+
+次のページで、本当のことを話させてください。
+      </p>
+      <div class="letter-signature">— より、心を込めて 🌸</div>
+    </div>
+    <div class="hearts-row">♡ ♡ ♡</div>
+    <button class="btn-open" onclick="showConfession()" style="margin-top:0">続きを読む →</button>
+  </div>
+
+  <!-- ③ 告白 -->
+  <div class="page" id="confession">
+    <div class="big-heart">💗</div>
+    <h2 class="confession-text">
+      好きです。<br>付き合ってください。
+    </h2>
+    <p class="confession-sub">
+      あなたのことが、ずっと好きでした。<br>
+      返事を聞かせてもらえますか？
+    </p>
+    <div class="answer-btns">
+      <button class="btn-yes" onclick="celebrate()">はい 💕</button>
+      <button class="btn-no" id="noBtn" onmouseover="moveNoBtn()" onclick="moveNoBtn()">ちょっと待って</button>
+    </div>
+  </div>
+
+  <!-- ④ やったー！ -->
+  <div class="page" id="celebration">
+    <div class="celebrate-emoji">🎉</div>
+    <h2 class="celebrate-title">やったー！！！</h2>
+    <div class="deco-line"></div>
+    <p class="celebrate-msg">
+      ありがとう、本当に嬉しいです。💖<br>
+      これからよろしくお願いします。<br><br>
+      一緒にたくさんの思い出を作ろうね 🌸
+    </p>
+    <div class="hearts-row" style="font-size:2rem; margin-top:1.5rem;">💖 💕 💗</div>
+  </div>
+
+<script>
+  // カーソル
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+  document.querySelectorAll('button, .envelope').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+  });
+
+  // 今日の日付
+  const d = new Date();
+  document.getElementById('letter-date').textContent =
+    `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
+
+  // 花びら生成
+  const petalEmojis = ['🌸','🌺','💮','🌷','✿'];
+  const container = document.getElementById('petals');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.textContent = petalEmojis[Math.floor(Math.random() * petalEmojis.length)];
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = (6 + Math.random() * 8) + 's';
+    p.style.animationDelay    = (Math.random() * 10) + 's';
+    p.style.fontSize = (0.8 + Math.random() * 1) + 'rem';
+    container.appendChild(p);
+  }
+
+  function showSection(id) {
+    ['cover','message','confession','celebration'].forEach(s => {
+      document.getElementById(s).style.display = 'none';
+    });
+    document.getElementById(id).style.display = 'flex';
+  }
+
+  function openLetter() {
+    showSection('message');
+  }
+
+  function showConfession() {
+    showSection('confession');
+  }
+
+  // "ちょっと待って" ボタンを逃がす
+  function moveNoBtn() {
+    const btn = document.getElementById('noBtn');
+    const vw = window.innerWidth - 180;
+    const vh = window.innerHeight - 80;
+    btn.style.position = 'fixed';
+    btn.style.left = Math.max(20, Math.random() * vw) + 'px';
+    btn.style.top  = Math.max(20, Math.random() * vh) + 'px';
+    btn.style.transition = 'left 0.25s, top 0.25s';
+    btn.style.zIndex = '100';
+  }
+
+  function celebrate() {
+    showSection('celebration');
+    launchConfetti();
+  }
+
+  // 紙吹雪
+  function launchConfetti() {
+    const colors = ['#f9b8c9','#d4446e','#e8b86d','#ffd6e0','#fff0f5','#f4a0bc'];
+    for (let i = 0; i < 80; i++) {
+      setTimeout(() => {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.width  = (6 + Math.random() * 10) + 'px';
+        el.style.height = (6 + Math.random() * 10) + 'px';
+        el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        el.style.animationDuration = (2.5 + Math.random() * 3) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 6000);
+      }, i * 40);
+    }
+  }
+</script>
+</body>
+</html>
